@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Vue.js!</title>
+    <link rel="stylesheet" href="../dist/css/styles.css">
+    <style> [v-cloak] { display: none; } </style>
+
+</head>
+
+<body>
+<div id="wrapper">
+    <div class="inner">
+        <h1 class="bigText">todos</h1>
+
+        <div id="app">
+            <input class="newTodo" :class="[newTodo, {shadowDrop: !todos.length}]" type="text" placeholder="what's need to be done?" v-model="newTodo" @keyup.enter="addTodo(newTodo)">
+            <ul v-if="todo" class="todoList">
+                <li class="todo" v-for="todo in todos" :key="todo.id" :class="{completed: todo.completed}">
+                    <div class="view">
+                        <input class="toggle" type="checkbox" v-model="todo.completed">
+                        <label>{{ todo.title }}</label>
+                        <button class="destroy" @click="removeTodo(todo)">×</button>
+                    </div>
+                </li>
+            </ul>
+            <div class="footer" :class="[{emptyTodo: !todos.length}, {singleTodo: todos.length == 1}, {doubleTodo: todos.length == 2}]">
+                <span>{{ todos.length }} {{ todos.length | pluralize }} in list :)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+<script>
+
+    var app = new Vue({
+        el: '#app',
+
+        data: function() {
+            return {
+                todos: [],
+                newTodo: "",
+                oldTodo: "",
+                todo: {
+                    id: "",
+                    title: "",
+                    completed: false
+                }
+            }
+        },
+
+        computed: {
+            remaining: function() {
+                var active = this.todos.completed.length;
+                return (this.todos.length - active)
+            }
+        },
+
+        filters: {
+            pluralize: function(n) {
+                return n === 1 ? 'item is' : 'items are';
+            }
+        },
+
+        methods: {
+
+            addTodo: function(newTodo) {
+                if ((newTodo !== "") && (!newTodo.match(/^[ ]+$/))) {
+                    this.todos.push({
+                            id: '',
+                            title: this.newTodo.toString(),
+                            completed: false
+                        }
+                    );
+                }
+
+                this.newTodo = ""
+            },
+
+            removeTodo: function (todo) {
+                this.todos.splice(this.todos.indexOf(todo), 1)
+            }
+        },
+
+        mounted() {
+            axios
+                .get('http://rafaelldi-todolist.herokuapp.com/api/v1/ToDo')
+                .then(response => {
+                  console.log(response);
+                });
+                /*.then(response => (this.id = response.id),
+                      response => (this.title = response.content));*/
+        }
+    })
+
+</script>
+
+</body>
+</html>
