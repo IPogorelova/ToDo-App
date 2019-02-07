@@ -1,2 +1,2 @@
 # ToDo-App
-Simple tiny ToDo App for training Vue.js skills
+Simple tiny ToDo app for training Vue.js skills
